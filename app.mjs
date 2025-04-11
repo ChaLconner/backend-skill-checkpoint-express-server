@@ -1,4 +1,6 @@
 import express from "express";
+import { validateAnswers } from "./middlewares/validateAnswers.mjs";
+import { validateQuestions } from "./middlewares/validateQuestions.mjs";
 
 const app = express();
 const port = 4000;
@@ -9,7 +11,8 @@ app.get("/test", (req, res) => {
   return res.json("Server API is working 🚀");
 });
 
-app.post("/questions", (req, res) => {
+// POST /questions
+app.post("/questions", [validateQuestions], (req, res) => {
   const { title, description, category } = req.body;
   if (!title || !description || !category) {
     return res.status(400).json({ message: "Invalid request data." });
@@ -57,7 +60,9 @@ app.delete("/questions/:questionId", (req, res) => {
   if (index === -1) return res.status(404).json({ message: "Question not found." });
 
   questions.splice(index, 1);
-  res.status(200).json({ message: "Question post has been deleted successfully." });
+  answers = answers.filter(a => a.questionId !== parseInt(req.params.questionId));
+
+  res.status(200).json({ message: "Question and its answers have been deleted successfully." });
 });
 
 // GET /questions/search
@@ -78,7 +83,7 @@ app.get("/questions/search", (req, res) => {
 });
 
 // POST /questions/:questionId/answers
-app.post("/questions/:questionId/answers", (req, res) => {
+app.post("/questions/:questionId/answers", [validateAnswers], (req, res) => {
   const { content } = req.body;
   if (!content) return res.status(400).json({ message: "Invalid request data." });
 
@@ -128,7 +133,10 @@ app.post("/answers/:answerId/vote", (req, res) => {
   if (!answer) return res.status(404).json({ message: "Answer not found." });
 
   answer.vote += vote;
-  res.status(200).json({ message: "Vote on the answer has been recorded successfully." });
+  res.status(200).json({ 
+    message: "Vote on the answer has been recorded successfully.", 
+    currentVote: answer.vote 
+  });
 });
 
 app.listen(port, () => {

@@ -1,4 +1,5 @@
 🧠 Quora-like API (Express + PostgreSQL)
+
 📘 Project Overview
 This is a RESTful API for a Q&A platform similar to Quora, built using Express.js and PostgreSQL. Users can create and manage questions and answers, vote on them, and search questions by title or category.
 

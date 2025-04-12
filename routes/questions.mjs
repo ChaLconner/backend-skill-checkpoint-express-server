@@ -133,10 +133,7 @@ questionsRouter.delete("/:questionId", async (req, res) => {
 });
 
 // POST /questions/:questionId/answers
-questionsRouter.post(
-  "/:questionId/answers",
-  [validateAnswers],
-  async (req, res) => {
+questionsRouter.post("/:questionId/answers", [validateAnswers], async (req, res) => {
     try {
       const questionId = parseInt(req.params.questionId);
       const { content } = req.body;
@@ -154,7 +151,7 @@ questionsRouter.post(
       }
 
       await connectionPool.query(
-        "INSERT INTO answers (question_id, content, vote) VALUES ($1, $2, 0)",
+        "INSERT INTO answers (question_id, content) VALUES ($1, $2)",
         [questionId, content]
       );
 
@@ -179,7 +176,7 @@ questionsRouter.get("/:questionId/answers", async (req, res) => {
     }
 
     const result = await connectionPool.query(
-      "SELECT id, content, vote FROM answers WHERE question_id = $1 ORDER BY id ASC",
+      "SELECT id, content FROM answers WHERE question_id = $1 ORDER BY id ASC",
       [questionId]
     );
 
@@ -225,7 +222,7 @@ questionsRouter.post("/:questionId/vote", async (req, res) => {
     }
 
     const result = await connectionPool.query(
-      "UPDATE questions SET vote = COALESCE(vote, 0) + $1 WHERE id = $2 RETURNING id",
+      "INSERT INTO question_votes (vote, question_id) VALUES ($1, $2)",
       [vote, questionId]
     );
 

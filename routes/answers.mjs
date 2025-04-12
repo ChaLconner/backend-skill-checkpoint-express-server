@@ -9,7 +9,6 @@ answersRouter.post("/:answerId/vote", async (req, res) => {
     const answerId = parseInt(req.params.answerId);    
     const vote = Number(req.body.vote);
 
-
     if (isNaN(answerId)) {
       return res.status(400).json({ message: "Invalid answerId. It must be a number." });
     }
@@ -28,7 +27,7 @@ answersRouter.post("/:answerId/vote", async (req, res) => {
     }
 
     await connectionPool.query(
-      "UPDATE answers SET vote = COALESCE(vote, 0) + $1 WHERE id = $2",
+      "INSERT INTO answer_votes (vote, answer_id) VALUES ($1, $2)",
       [vote, answerId]
     );
 
